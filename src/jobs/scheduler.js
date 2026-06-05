@@ -18,7 +18,7 @@ function startScheduler() {
         'Scheduler started'
     );
 
-    
+   
     cron.schedule(
         '0 */2 * * *',
         async () => {

@@ -47,7 +47,7 @@ async function exportTasks(req, res) {
             console.log(
                 'Export generated',
                 {
-                    user_id: req.user.id,
+                    user_id: req.user.sub,
                     format: exportFormat,
                     team_id
                 }
@@ -96,7 +96,7 @@ async function exportTasks(req, res) {
             console.log(
                 'Export generated',
                 {
-                    user_id: req.user.id,
+                    user_id: req.user.sub,
                     format: exportFormat,
                     team_id
                 }

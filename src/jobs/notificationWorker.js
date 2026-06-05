@@ -37,7 +37,9 @@ function startWorker() {
             );
 
             if (io) {
-                io.emit(
+                io.to(
+                    `user_${job.user_id}`
+                ).emit(
                     'notification',
                     {
                         title: job.title,

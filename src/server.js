@@ -52,11 +52,38 @@ app.use('/analytics', analyticsRoutes);
 app.use('/export', exportRoutes);
 
 io.on('connection', (socket) => {
-    console.log('Client connected:', socket.id);
 
-    socket.on('disconnect', () => {
-        console.log('Client disconnected:', socket.id);
-    });
+    console.log(
+        'Client connected:',
+        socket.id
+    );
+
+    socket.on(
+        'join-room',
+        (room) => {
+
+            socket.join(room);
+
+            console.log(
+                'Joined room:',
+                room
+            );
+
+        }
+    );
+
+    socket.on(
+        'disconnect',
+        () => {
+
+            console.log(
+                'Client disconnected:',
+                socket.id
+            );
+
+        }
+    );
+
 });
 
 const PORT = process.env.PORT || 3000;

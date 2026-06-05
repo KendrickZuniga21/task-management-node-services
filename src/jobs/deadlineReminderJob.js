@@ -25,8 +25,9 @@ async function runDeadlineReminder() {
                             process.env.SYSTEM_EMAIL,
                         password:
                             process.env.SYSTEM_PASSWORD
-                }
-            ));
+                    }
+                )
+            );
 
         const token =
             loginResponse.data.token;
@@ -35,20 +36,43 @@ async function runDeadlineReminder() {
             'System login successful'
         );
 
-        const response =
+        const teamsResponse =
             await retry(
                 () => axios.get(
-                    `${process.env.LARAVEL_API_URL}/teams/1/tasks?all=true`,
+                    `${process.env.LARAVEL_API_URL}/teams`,
                     {
                         headers: {
                             Authorization:
                                 `Bearer ${token}`
+                        }
                     }
-                }
-            ));
+                )
+            );
 
-        const tasks =
-            response.data;
+        const teams =
+            teamsResponse.data.data;
+
+        let tasks = [];
+
+        for (const team of teams) {
+
+            const response =
+                await retry(
+                    () => axios.get(
+                        `${process.env.LARAVEL_API_URL}/teams/${team.id}/tasks?all=true`,
+                        {
+                            headers: {
+                                Authorization:
+                                    `Bearer ${token}`
+                            }
+                        }
+                    )
+                );
+
+            tasks.push(
+                ...response.data
+            );
+        }
 
         const now =
             new Date();
@@ -61,9 +85,16 @@ async function runDeadlineReminder() {
         );
 
         tasks.forEach(task => {
+
             if (
                 !task.due_date ||
                 task.status === 'completed'
+            ) {
+                return;
+            }
+
+            if (
+                !task.assigned_user
             ) {
                 return;
             }
@@ -75,13 +106,18 @@ async function runDeadlineReminder() {
                 due >= now &&
                 due <= next24Hours
             ) {
+
                 sendNotification(
                     'Deadline Reminder',
                     `Task "${task.title}" is due within 24 hours`,
-                    task.assigned_user?.email ||
-                        'test@example.com',
+                    task.assigned_user.email,
                     task.assigned_to,
                     'deadline_reminder'
+                );
+
+                console.log(
+                    'Reminder queued for:',
+                    task.assigned_user.name
                 );
             }
         });
