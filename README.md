@@ -124,4 +124,4 @@ LARAVEL_API_URL=https://task-management-laravel-api-production.up.railway.app/ap
 Author
 
 Daryll Kendrick Zuniga
-```md
+```bash
